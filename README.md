@@ -1,3 +1,6 @@
+# THIS IS MODIFIED REPOSITORY OF https://github.com/The1only/rosettadrone
+Due to large size of the original repository forking failed and this repository contains modifications to enable MQTT telemetry link and Video feed from Mavic Air 2
+
 # RosettaDrone 2 is now updated to DJI SDK 4.14 beta 1...
 
 Rosetta Drone 2 tested on **DJI Air, Mavic 2 x and Matrice 210 V2, Mavic Pro, Mavic AIR series
