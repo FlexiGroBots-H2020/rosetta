@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMaptype = Integer.parseInt(Objects.requireNonNull(prefs.getString("pref_maptype_mode", "2")));
         logMessageDJI("Mapmode: " + mMaptype);
         //------------------------------------------------------------
-
+        Log.e(TAG, "initPacketizer: Create Intent for video: "+ mvideoIPString+":"+videoPort);
         Intent intent = new Intent(this, VideoService.class);
         this.startService(intent);
         safeSleep(500);
@@ -636,9 +636,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mTimerHandler.postDelayed(enablesafety, 3000);
         //--------------------------------------------------------------
         // Kari: MQTT hook here
-        mMQTTclient = new MQTTClient(this, prefs.getString("pref_mqtt_hosturl", "tcp://mqtt.example.com:1883"), "rosetta");
-        mMQTTclient.setTopic(prefs.getString("pref_mqtt_topicdef", "rosetta"));
-        mMQTTclient.connect();
+        if(prefs.getBoolean("pref_mqtt_enabled", false)) {
+            mMQTTclient = new MQTTClient(this, prefs.getString("pref_mqtt_hosturl", "tcp://mqtt.example.com:1883"), "rosetta");
+            mMQTTclient.setTopic(prefs.getString("pref_mqtt_topicdef", "rosetta"));
+            mMQTTclient.connect();
+        }
     }
 
     // Start the AI Pluggin (Developed by the customers...)
@@ -731,6 +733,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
 
             if (!product.getModel().equals(Model.UNKNOWN_AIRCRAFT)) {
+                Log.e(TAG, "Product name: "+ product.getModel().name());
                 mCamera = product.getCamera();
                 if (mCamera != null) {
                     mCamera.setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO, djiError -> {
@@ -758,6 +761,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             standardVideoFeeder.removeVideoDataListener(listener);
                         }
                         standardVideoFeeder.addVideoDataListener(mReceivedVideoDataListener);
+                        Log.d(TAG, "Transcode Video !!!!!!!");
                         logMessageDJI("Transcode Video !!!!!!!");
                     }
                 } else {
@@ -767,6 +771,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             videoFeeder.removeVideoDataListener(listener);
                         }
                         videoFeeder.addVideoDataListener(mReceivedVideoDataListener);
+                        Log.d(TAG, "Do NOT Transcode Video !!!!!!!");
                         logMessageDJI("Do NOT Transcode Video !!!!!!!");
                     }
                 }
@@ -1136,13 +1141,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     // Mwthod for reinitiating MQTT Client and connection
     private void updateMQTTConnection() {
-        this.mMQTTclient.disconnect();
-        this.mMQTTclient = null;
-        this.mMQTTclient = new MQTTClient(this, prefs.getString("pref_mqtt_hosturl", "tcp://mqtt.example.com:1883"), "rosetta");
-        this.mMQTTclient.setTopic(prefs.getString("pref_mqtt_topicdef", "rosetta"));
-        this.mMQTTclient.connect();
-        FLAG_MQTT_HOST_CHANGED = false;
-        FLAG_MQTT_TOPIC_CHANGED = false;
+        if(prefs.getBoolean("pref_mqtt_enabled", false)) {
+            this.mMQTTclient.disconnect();
+            this.mMQTTclient = null;
+            this.mMQTTclient = new MQTTClient(this, prefs.getString("pref_mqtt_hosturl", "tcp://mqtt.example.com:1883"), "rosetta");
+            this.mMQTTclient.setTopic(prefs.getString("pref_mqtt_topicdef", "rosetta"));
+            this.mMQTTclient.connect();
+            FLAG_MQTT_HOST_CHANGED = false;
+            FLAG_MQTT_TOPIC_CHANGED = false;
+        }
     }
 
     public void showPopup(View v) {

@@ -190,6 +190,11 @@ v
             android:dependency="pref_mqtt_enabled"
             android:key="pref_mqtt_topicdef"
             android:title="@string/pref_mqtt_topic" />
+        <androidx.preference.EditTextPreference
+            android:defaultValue="rosetta"
+            android:dependency="pref_mqtt_enabled"
+            android:key="pref_mqtt_clientdef"
+            android:title="@string/pref_mqtt_clientid" />
     </PreferenceCategory>
 
     <PreferenceCategory
